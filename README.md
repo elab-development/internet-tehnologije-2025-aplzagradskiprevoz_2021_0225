@@ -53,3 +53,11 @@ Zahtev za minimum 10 smislenih komitova i komitovanje od svih clanova tima morat
 
 ## Dokumentacija
 Privremena dokumentacija je u `docs/Faza1.md`. Zamenite je template-om iz priloga cim ga obezbedite.
+
+## Demo scenario
+
+1. Korisnik pretražuje stanicu po nazivu.
+2. Aplikacija prikazuje detalje stanice.
+3. Prikazuju se linije koje staju na stanici.
+4. Klikom na liniju prikazuje se trasa na mapi.
+5. Može se videti i demo status popunjenosti linije.
