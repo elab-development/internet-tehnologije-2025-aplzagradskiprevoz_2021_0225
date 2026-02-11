@@ -1,0 +1,20 @@
+node_modules/
+.next/
+.env
+.env.local
+.DS_Store
+
+server/node_modules/
+web/node_modules/
+
+# Logs
+*.log
+
+# Docker
+*.pid
+
+# Data
+data/gtfs/
+
+# VS Code
+.vscode/
