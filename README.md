@@ -61,3 +61,10 @@ Privremena dokumentacija je u `docs/Faza1.md`. Zamenite je template-om iz prilog
 3. Prikazuju se linije koje staju na stanici.
 4. Klikom na liniju prikazuje se trasa na mapi.
 5. Može se videti i demo status popunjenosti linije.
+
+## Tehnologije
+
+- Frontend: Next.js (React) + Tailwind
+- Backend: Express.js
+- Baza: PostgreSQL + PostGIS
+- Mapa: Leaflet + OpenStreetMap
