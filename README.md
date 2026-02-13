@@ -40,13 +40,13 @@ Frontend radi na `http://localhost:3000`.
 
 ## API rute (osnovno)
 - `GET /health`
-- `GET /stations?query=...`
-- `GET /stations/:id`
-- `GET /stations/:id/lines`
-- `GET /lines?query=...`
-- `GET /lines/:id/shape`
-- `GET /lines/:id/crowd`
-- `POST /lines/:id/crowd` `{ "status": "none|low|medium|high" }`
+- `GET /stanice?query=...`
+- `GET /stanice/:id`
+- `GET /stanice/:id/linije`
+- `GET /linije?query=...`
+- `GET /linije/:id/shape`
+- `GET /linije/:id/crowd`
+- `POST /linije/:id/crowd` `{ "status": "none|low|medium|high" }`
 
 ## Napomena o Git obavezama
 Zahtev za minimum 10 smislenih komitova i komitovanje od svih clanova tima morate uraditi rucno u toku rada.

@@ -14,7 +14,10 @@ export async function dohvatiStanicu(id) {
 }
 
 export async function dohvatiTrasuLinije(id, stationId) {
-  const qs = stationId ? `?stationId=${encodeURIComponent(stationId)}` : '';
+  const brojStanice = Number(stationId);
+  const qs = Number.isFinite(brojStanice) && brojStanice > 0
+    ? `?stationId=${encodeURIComponent(brojStanice)}`
+    : '';
   const res = await fetch(`${baseUrl}/linije/${id}/shape${qs}`);
   return res.json();
 }

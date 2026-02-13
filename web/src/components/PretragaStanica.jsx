@@ -88,6 +88,9 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
           ))
         )}
       </ul>
+      {!selectedStation && !loading && query.trim() !== '' && results.length === 0 ? (
+        <div className="mt-3 text-sm text-slate-500">Nema rezultata za uneti pojam.</div>
+      ) : null}
     </div>
   );
 }
