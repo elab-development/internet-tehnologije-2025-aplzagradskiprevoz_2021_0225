@@ -18,11 +18,11 @@ export async function dohvatiTrasuLinije(id, stationId) {
   const qs = Number.isFinite(brojStanice) && brojStanice > 0
     ? `?stationId=${encodeURIComponent(brojStanice)}`
     : '';
-  const res = await fetch(`${baseUrl}/linije/${id}/shape${qs}`);
+  const res = await fetch(`${baseUrl}/linije/${id}/trasa${qs}`);
   return res.json();
 }
 
 export async function dohvatiStatusGuzve(id) {
-  const res = await fetch(`${baseUrl}/linije/${id}/crowd`);
+  const res = await fetch(`${baseUrl}/linije/${id}/guzva`);
   return res.json();
 }

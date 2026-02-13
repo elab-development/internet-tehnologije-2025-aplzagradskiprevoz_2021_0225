@@ -7,29 +7,12 @@ export default function DetaljiLinije({ lines, onLineSelected, selectedStationId
   const [selectedLineId, setSelectedLineId] = useState(null);
   const [crowd, setCrowd] = useState(null);
 
-  function formatCrowd(status) {
-    switch ((status || '').toLowerCase()) {
-      case 'none':
-        return 'nema';
-      case 'low':
-        return 'mala';
-      case 'medium':
-        return 'srednja';
-      case 'high':
-        return 'velika';
-      case 'unknown':
-        return 'nepoznato';
-      default:
-        return status || 'nepoznato';
-    }
-  }
-
   async function handleLine(lineId) {
     setSelectedLineId(lineId);
     const data = await dohvatiTrasuLinije(lineId, selectedStationId);
     onLineSelected(data);
     const crowdData = await dohvatiStatusGuzve(lineId);
-    setCrowd(crowdData.status || 'unknown');
+    setCrowd(crowdData.status || 'nepoznato');
   }
 
   return (
@@ -51,7 +34,7 @@ export default function DetaljiLinije({ lines, onLineSelected, selectedStationId
                   selectedLineId === l.id ? 'bg-rose text-white' : 'border border-rose text-rose'
                 }`}
               >
-                Prikaži trasu
+                Prikazi trasu
               </button>
             </li>
           ))}
@@ -59,7 +42,7 @@ export default function DetaljiLinije({ lines, onLineSelected, selectedStationId
       )}
       {selectedLineId && (
         <div className="mt-4 rounded-xl border border-slate-100 bg-white px-3 py-2 text-sm">
-          Status gužve: <span className="font-semibold">{formatCrowd(crowd)}</span>
+          Status guzve: <span className="font-semibold">{crowd || 'nepoznato'}</span>
         </div>
       )}
     </div>

@@ -44,15 +44,9 @@ Frontend radi na `http://localhost:3000`.
 - `GET /stanice/:id`
 - `GET /stanice/:id/linije`
 - `GET /linije?query=...`
-- `GET /linije/:id/shape`
-- `GET /linije/:id/crowd`
-- `POST /linije/:id/crowd` `{ "status": "none|low|medium|high" }`
-
-## Napomena o Git obavezama
-Zahtev za minimum 10 smislenih komitova i komitovanje od svih clanova tima morate uraditi rucno u toku rada.
-
-## Dokumentacija
-Privremena dokumentacija je u `docs/Faza1.md`. Zamenite je template-om iz priloga cim ga obezbedite.
+- `GET /linije/:id/trasa`
+- `GET /linije/:id/guzva`
+- `POST /linije/:id/guzva` `{ "status": "nema|mala|srednja|velika" }`
 
 ## Demo scenario
 
