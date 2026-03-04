@@ -13,21 +13,24 @@ DROP TABLE IF EXISTS Korisnik;
 
 CREATE TABLE Korisnik (
   idKorisnika SERIAL PRIMARY KEY,
-  korisnickoIme TEXT,
-  lozinka TEXT,
-  uloga TEXT
+  korisnickoIme TEXT NOT NULL UNIQUE,
+  lozinka TEXT NOT NULL,
+  uloga TEXT NOT NULL CHECK (uloga IN ('obican', 'premium', 'vozac'))
 );
 
 CREATE TABLE Vozac (
   idVozaca SERIAL PRIMARY KEY,
-  brojLicence TEXT,
-  jeAktivan BOOLEAN,
+  korisnikId INT NOT NULL UNIQUE REFERENCES Korisnik(idKorisnika) ON DELETE CASCADE,
+  brojLicence TEXT NOT NULL UNIQUE,
+  jeAktivan BOOLEAN DEFAULT TRUE,
   trenutnaLinijaID INT
 );
 
 CREATE TABLE Putnik (
   idPutnika SERIAL PRIMARY KEY,
-  omiljeneStanice INT[]
+  korisnikId INT NOT NULL UNIQUE REFERENCES Korisnik(idKorisnika) ON DELETE CASCADE,
+  tipPutnika TEXT NOT NULL CHECK (tipPutnika IN ('obican', 'premium')),
+  omiljeneStanice INT[] DEFAULT '{}'
 );
 
 CREATE TABLE Autobus (

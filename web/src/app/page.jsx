@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import PretragaStanica from '../components/PretragaStanica';
 import DetaljiLinije from '../components/DetaljiLinije';
+import AuthPanel from '../components/AuthPanel';
 import { dohvatiTrasuLinije } from '../lib/api';
 
 const Mapa = dynamic(() => import('../components/Mapa'), { ssr: false });
@@ -14,6 +15,17 @@ export default function HomePage() {
   const [lines, setLines] = useState([]);
   const [lineShape, setLineShape] = useState(null);
   const [lineStations, setLineStations] = useState([]);
+  const [auth, setAuth] = useState(null);
+
+  useEffect(() => {
+    const sacuvanAuth = localStorage.getItem('authData');
+    if (!sacuvanAuth) return;
+    try {
+      setAuth(JSON.parse(sacuvanAuth));
+    } catch (err) {
+      localStorage.removeItem('authData');
+    }
+  }, []);
 
   function normalizeShape(shape) {
     if (!shape) return null;
@@ -50,6 +62,16 @@ export default function HomePage() {
     setLineStations([]);
   }
 
+  function handleAuthChange(data) {
+    setAuth(data);
+    localStorage.setItem('authData', JSON.stringify(data));
+  }
+
+  function handleLogout() {
+    setAuth(null);
+    localStorage.removeItem('authData');
+  }
+
   return (
     <main className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto grid lg:grid-cols-[360px_1fr] gap-8">
@@ -57,6 +79,8 @@ export default function HomePage() {
           <header className="space-y-2">
             <h1 className="text-3xl font-semibold text-ink">Bus Minus</h1>
           </header>
+
+          <AuthPanel auth={auth} onAuthChange={handleAuthChange} onLogout={handleLogout} />
 
           <PretragaStanica
             onStationSelected={handleStationSelected}
@@ -69,6 +93,7 @@ export default function HomePage() {
               lines={lines}
               onLineSelected={handleLineSelected}
               selectedStationId={selectedStation?.id}
+              auth={auth}
             />
           ) : null}
         </aside>

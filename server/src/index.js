@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import stationsRouter from './routes/stanice.js';
 import linesRouter from './routes/linije.js';
+import authRouter from './routes/auth.js';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.get('/health', (req, res) => {
 
 app.use('/stanice', stationsRouter);
 app.use('/linije', linesRouter);
+app.use('/auth', authRouter);
 
 const port = Number(process.env.PORT || 4000);
 app.listen(port, () => {

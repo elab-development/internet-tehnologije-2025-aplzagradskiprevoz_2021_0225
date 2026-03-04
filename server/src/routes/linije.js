@@ -1,4 +1,5 @@
 import express from 'express';
+import { zahtevajPrijavu, zahtevajUlogu } from '../middleware/auth.js';
 import {
   dohvatiExternalIdStanice,
   dohvatiFallbackGeometrijuLinije,
@@ -107,7 +108,7 @@ router.get('/:id/guzva', async (req, res) => {
   }
 });
 
-router.post('/:id/guzva', async (req, res) => {
+router.post('/:id/guzva', zahtevajPrijavu, zahtevajUlogu(['vozac']), async (req, res) => {
   const id = Number(req.params.id);
   const ulazniStatus = String(req.body.status || '').toLowerCase();
   const status = apiToDbStatus[ulazniStatus];
