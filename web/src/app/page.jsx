@@ -93,6 +93,7 @@ export default function HomePage() {
                 lines={lines}
                 onLineSelected={handleLineSelected}
                 selectedStationId={selectedStation?.id}
+                auth={auth}
               />
             ) : null}
           </aside>

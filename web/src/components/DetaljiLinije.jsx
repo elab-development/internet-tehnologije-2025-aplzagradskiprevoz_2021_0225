@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { dohvatiTrasuLinije, dohvatiStatusGuzve } from '../lib/api';
 
-export default function DetaljiLinije({ lines, onLineSelected, selectedStationId }) {
+export default function DetaljiLinije({ lines, onLineSelected, selectedStationId, auth }) {
   const [selectedLineId, setSelectedLineId] = useState(null);
   const [crowd, setCrowd] = useState(null);
 
@@ -11,8 +11,12 @@ export default function DetaljiLinije({ lines, onLineSelected, selectedStationId
     setSelectedLineId(lineId);
     const data = await dohvatiTrasuLinije(lineId, selectedStationId);
     onLineSelected(data);
+    if (!auth?.token) {
+      setCrowd(null);
+      return;
+    }
     try {
-      const crowdData = await dohvatiStatusGuzve(lineId);
+      const crowdData = await dohvatiStatusGuzve(lineId, auth.token);
       setCrowd(crowdData.status || 'nepoznato');
     } catch (err) {
       setCrowd('nepoznato');
@@ -46,7 +50,15 @@ export default function DetaljiLinije({ lines, onLineSelected, selectedStationId
       )}
       {selectedLineId && (
         <div className="mt-4 rounded-xl border border-slate-100 bg-white px-3 py-2 text-sm">
-          Status guzve: <span className="font-semibold">{crowd || 'nepoznato'}</span>
+          {auth?.token ? (
+            <>
+              Status guzve: <span className="font-semibold">{crowd || 'nepoznato'}</span>
+            </>
+          ) : (
+            <>
+              Status guzve: <span className="font-semibold">Prijavite se da vidite podatak.</span>
+            </>
+          )}
         </div>
       )}
     </div>

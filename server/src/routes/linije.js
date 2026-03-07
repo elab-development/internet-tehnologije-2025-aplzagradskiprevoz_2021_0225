@@ -94,7 +94,7 @@ router.get('/:id/trasa', async (req, res) => {
   }
 });
 
-router.get('/:id/guzva', async (req, res) => {
+router.get('/:id/guzva', zahtevajPrijavu, async (req, res) => {
   const id = Number(req.params.id);
   if (!id) return res.status(400).json({ error: 'Invalid id' });
 

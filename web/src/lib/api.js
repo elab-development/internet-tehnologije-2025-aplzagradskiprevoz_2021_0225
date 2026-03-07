@@ -22,9 +22,14 @@ export async function dohvatiTrasuLinije(id, stationId) {
   return res.json();
 }
 
-export async function dohvatiStatusGuzve(id) {
-  const res = await fetch(`${baseUrl}/linije/${id}/guzva`);
-  return res.json();
+export async function dohvatiStatusGuzve(id, token) {
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const res = await fetch(`${baseUrl}/linije/${id}/guzva`, { headers });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Neuspesno dohvatanje statusa guzve');
+  }
+  return data;
 }
 
 export async function registrujKorisnika(payload) {
