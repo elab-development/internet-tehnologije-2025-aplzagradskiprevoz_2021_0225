@@ -7,12 +7,11 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   async function handleSearch(e) {
     e.preventDefault();
-    if (selectedStation && onClearSelection) {
-      onClearSelection();
-    }
+    setHasSearched(true);
     setLoading(true);
     const data = await dohvatiStanice(query);
     setResults(Array.isArray(data) ? data : []);
@@ -32,7 +31,16 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
           className="flex-1 rounded-2xl border border-rose/30 bg-white px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-rose/40"
           placeholder="Unesi naziv ili kod stanice..."
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            if (selectedStation && onClearSelection) {
+              onClearSelection();
+              setResults([]);
+            }
+            if (hasSearched) {
+              setHasSearched(false);
+            }
+          }}
         />
         <button
           type="submit"
@@ -88,7 +96,7 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
           ))
         )}
       </ul>
-      {!selectedStation && !loading && query.trim() !== '' && results.length === 0 ? (
+      {!selectedStation && !loading && hasSearched && results.length === 0 ? (
         <div className="mt-3 text-sm text-slate-500">Nema rezultata za uneti pojam.</div>
       ) : null}
     </div>

@@ -34,16 +34,6 @@ const apiToDbStatus = {
   velika: 'high'
 };
 
-function bezbednoParsiranjeGeojson(geojsonText) {
-  if (!geojsonText) return null;
-  if (typeof geojsonText === 'object') return geojsonText;
-  try {
-    return JSON.parse(geojsonText);
-  } catch (err) {
-    return null;
-  }
-}
-
 router.get('/', async (req, res) => {
   const query = (req.query.query || '').trim();
   try {
@@ -90,13 +80,13 @@ router.get('/:id/trasa', async (req, res) => {
       shapeGeojson = shapeRes?.geojson || null;
     }
 
-    if (!stationsRes || stationsRes.length === 0) {
+    if (!stationsRes) {
       stationsRes = await dohvatiFallbackStaniceZaLiniju(id);
     }
 
     res.json({
       line,
-      shape: bezbednoParsiranjeGeojson(shapeGeojson),
+      shape: shapeGeojson ? JSON.parse(shapeGeojson) : null,
       stations: stationsRes
     });
   } catch (err) {
