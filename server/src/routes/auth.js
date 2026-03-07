@@ -8,8 +8,6 @@ import {
 
 const router = express.Router();
 
-const dozvoljeneUloge = ['obican', 'premium', 'vozac'];
-
 function kreirajToken(korisnik) {
   return jwt.sign(
     {
@@ -25,8 +23,7 @@ function kreirajToken(korisnik) {
 router.post('/register', async (req, res) => {
   const korisnickoIme = String(req.body.korisnickoIme || '').trim();
   const lozinka = String(req.body.lozinka || '');
-  const uloga = String(req.body.uloga || 'obican').toLowerCase();
-  const brojLicence = String(req.body.brojLicence || '').trim();
+  const uloga = 'premium';
 
   if (korisnickoIme.length < 3) {
     return res.status(400).json({ error: 'Korisnicko ime mora imati bar 3 karaktera' });
@@ -34,14 +31,6 @@ router.post('/register', async (req, res) => {
 
   if (lozinka.length < 6) {
     return res.status(400).json({ error: 'Lozinka mora imati bar 6 karaktera' });
-  }
-
-  if (!dozvoljeneUloge.includes(uloga)) {
-    return res.status(400).json({ error: 'Nepoznata uloga korisnika' });
-  }
-
-  if (uloga === 'vozac' && brojLicence.length < 3) {
-    return res.status(400).json({ error: 'Broj licence je obavezan za vozaca' });
   }
 
   try {
@@ -54,8 +43,7 @@ router.post('/register', async (req, res) => {
     const korisnik = await kreirajKorisnika({
       korisnickoIme,
       lozinkaHash,
-      uloga,
-      brojLicence: uloga === 'vozac' ? brojLicence : null
+      uloga
     });
     const token = kreirajToken(korisnik);
 

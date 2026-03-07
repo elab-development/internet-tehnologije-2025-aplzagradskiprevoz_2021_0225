@@ -13,7 +13,7 @@ export async function pronadjiKorisnikaPoKorisnickomImenu(korisnickoIme) {
   return rows[0] || null;
 }
 
-export async function kreirajKorisnika({ korisnickoIme, lozinkaHash, uloga, brojLicence }) {
+export async function kreirajKorisnika({ korisnickoIme, lozinkaHash, uloga }) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -29,23 +29,13 @@ export async function kreirajKorisnika({ korisnickoIme, lozinkaHash, uloga, broj
 
     const korisnik = korisnikRes.rows[0];
 
-    if (uloga === 'vozac') {
-      await client.query(
-        `
-          INSERT INTO Vozac (korisnikId, brojLicence, jeAktivan)
-          VALUES ($1, $2, TRUE)
-        `,
-        [korisnik.id, brojLicence]
-      );
-    } else {
-      await client.query(
-        `
-          INSERT INTO Putnik (korisnikId, tipPutnika)
-          VALUES ($1, $2)
-        `,
-        [korisnik.id, uloga]
-      );
-    }
+    await client.query(
+      `
+        INSERT INTO Putnik (korisnikId, tipPutnika)
+        VALUES ($1, $2)
+      `,
+      [korisnik.id, uloga]
+    );
 
     await client.query('COMMIT');
     return korisnik;

@@ -74,49 +74,49 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen p-8">
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-[360px_1fr] gap-8">
-        <aside className="space-y-6">
-          <header className="space-y-2">
-            <h1 className="text-3xl font-semibold text-ink">Bus Minus</h1>
-          </header>
-
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-6 flex items-start justify-between gap-4">
+          <h1 className="text-3xl font-semibold text-ink">Bus Minus</h1>
           <AuthPanel auth={auth} onAuthChange={handleAuthChange} onLogout={handleLogout} />
+        </header>
 
-          <PretragaStanica
-            onStationSelected={handleStationSelected}
-            selectedStation={selectedStation}
-            onClearSelection={handleClearSelection}
-          />
-
-          {selectedStation ? (
-            <DetaljiLinije
-              lines={lines}
-              onLineSelected={handleLineSelected}
-              selectedStationId={selectedStation?.id}
-              auth={auth}
+        <div className="grid lg:grid-cols-[360px_1fr] gap-8">
+          <aside className="space-y-6">
+            <PretragaStanica
+              onStationSelected={handleStationSelected}
+              selectedStation={selectedStation}
+              onClearSelection={handleClearSelection}
             />
-          ) : null}
-        </aside>
 
-        <section className="rounded-3xl bg-white/70 p-4 border border-rose/20 shadow-sm">
-          <Mapa
-            stations={stations}
-            selectedStationId={selectedStation?.id}
-            selectedStation={selectedStation}
-            lineShape={lineShape}
-            lineStations={lineStations}
-          />
-          {lineStations.length > 0 ? (
-            <div className="mt-4">
-              <div className="text-sm font-semibold text-slate-600">Redosled stanica</div>
-              <ol className="mt-2 list-decimal list-inside text-sm text-slate-600">
-                {lineStations.map((s) => (
-                  <li key={s.id}>{s.name}</li>
-                ))}
-              </ol>
-            </div>
-          ) : null}
-        </section>
+            {selectedStation ? (
+              <DetaljiLinije
+                lines={lines}
+                onLineSelected={handleLineSelected}
+                selectedStationId={selectedStation?.id}
+              />
+            ) : null}
+          </aside>
+
+          <section className="rounded-3xl bg-white/70 p-4 border border-rose/20 shadow-sm">
+            <Mapa
+              stations={stations}
+              selectedStationId={selectedStation?.id}
+              selectedStation={selectedStation}
+              lineShape={lineShape}
+              lineStations={lineStations}
+            />
+            {lineStations.length > 0 ? (
+              <div className="mt-4">
+                <div className="text-sm font-semibold text-slate-600">Redosled stanica</div>
+                <ol className="mt-2 list-decimal list-inside text-sm text-slate-600">
+                  {lineStations.map((s) => (
+                    <li key={s.id}>{s.name}</li>
+                  ))}
+                </ol>
+              </div>
+            ) : null}
+          </section>
+        </div>
       </div>
     </main>
   );

@@ -56,21 +56,3 @@ export async function prijaviKorisnika(payload) {
 
   return data;
 }
-
-export async function postaviStatusGuzve(id, status, token) {
-  const res = await fetch(`${baseUrl}/linije/${id}/guzva`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({ status })
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error || 'Upis statusa nije uspeo');
-  }
-
-  return data;
-}

@@ -15,7 +15,7 @@ CREATE TABLE Korisnik (
   idKorisnika SERIAL PRIMARY KEY,
   korisnickoIme TEXT NOT NULL UNIQUE,
   lozinka TEXT NOT NULL,
-  uloga TEXT NOT NULL CHECK (uloga IN ('obican', 'premium', 'vozac'))
+  uloga TEXT NOT NULL CHECK (uloga IN ('obican', 'premium'))
 );
 
 CREATE TABLE Vozac (
