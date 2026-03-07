@@ -61,3 +61,45 @@ export async function prijaviKorisnika(payload) {
 
   return data;
 }
+
+export async function prijaviVozaca(payload) {
+  const res = await fetch(`${baseUrl}/vozac/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Prijava vozaca nije uspela');
+  }
+
+  return data;
+}
+
+export async function dohvatiVozacevuLiniju(token) {
+  const res = await fetch(`${baseUrl}/vozac/moja-linija`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Neuspesno dohvatanje linije vozaca');
+  }
+  return data;
+}
+
+export async function upisiVozacevuGuzvu(status, token) {
+  const res = await fetch(`${baseUrl}/vozac/moja-linija/guzva`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ status })
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Neuspesan upis statusa guzve');
+  }
+  return data;
+}

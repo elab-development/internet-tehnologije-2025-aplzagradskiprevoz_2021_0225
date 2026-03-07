@@ -12,6 +12,7 @@ import {
   dohvatiStatusGuzveLinije,
   upisiStatusGuzveLinije
 } from '../repositories/linijeRepo.js';
+import { dodeliDnevnuLinijuAkoNedostaje } from '../repositories/vozacRepo.js';
 
 const router = express.Router();
 
@@ -116,6 +117,11 @@ router.post('/:id/guzva', zahtevajPrijavu, zahtevajUlogu(['vozac']), async (req,
   if (!status) return res.status(400).json({ error: 'Invalid status' });
 
   try {
+    const vozacLinija = await dodeliDnevnuLinijuAkoNedostaje(req.auth.vozacId);
+    if (!vozacLinija || Number(vozacLinija.line_id) !== id) {
+      return res.status(403).json({ error: 'Mozete menjati guzvu samo za svoju dnevnu liniju' });
+    }
+
     await upisiStatusGuzveLinije(id, status);
 
     res.json({ ok: true });
