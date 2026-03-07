@@ -75,7 +75,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-6 flex items-start justify-between gap-4">
+        <header className="relative z-[1200] mb-6 flex items-start justify-between gap-4">
           <h1 className="text-3xl font-semibold text-ink">Bus Minus</h1>
           <AuthPanel auth={auth} onAuthChange={handleAuthChange} onLogout={handleLogout} />
         </header>

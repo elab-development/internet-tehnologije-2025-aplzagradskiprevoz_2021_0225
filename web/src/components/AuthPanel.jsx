@@ -55,7 +55,7 @@ export default function AuthPanel({ auth, onAuthChange, onLogout }) {
   }
 
   return (
-    <div className="relative">
+    <div className="relative z-[1200]">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -65,7 +65,7 @@ export default function AuthPanel({ auth, onAuthChange, onLogout }) {
       </button>
 
       {open ? (
-        <div className="absolute right-0 z-20 mt-2 w-[320px] rounded-2xl border border-rose/20 bg-white p-4 shadow-lg">
+        <div className="absolute right-0 z-[1300] mt-2 w-[320px] rounded-2xl border border-rose/20 bg-white p-4 shadow-lg">
           <div className="flex gap-2">
             <button
               type="button"

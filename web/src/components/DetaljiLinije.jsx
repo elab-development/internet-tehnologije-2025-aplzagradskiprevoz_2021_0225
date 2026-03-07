@@ -11,8 +11,12 @@ export default function DetaljiLinije({ lines, onLineSelected, selectedStationId
     setSelectedLineId(lineId);
     const data = await dohvatiTrasuLinije(lineId, selectedStationId);
     onLineSelected(data);
-    const crowdData = await dohvatiStatusGuzve(lineId);
-    setCrowd(crowdData.status || 'nepoznato');
+    try {
+      const crowdData = await dohvatiStatusGuzve(lineId);
+      setCrowd(crowdData.status || 'nepoznato');
+    } catch (err) {
+      setCrowd('nepoznato');
+    }
   }
 
   return (
