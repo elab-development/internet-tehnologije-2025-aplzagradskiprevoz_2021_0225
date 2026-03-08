@@ -9,6 +9,31 @@ import {
   ukloniOmiljenuStanicu
 } from '../lib/api';
 
+function StarIcon({ filled }) {
+  if (filled) {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+        <path
+          fill="#e11d48"
+          d="M12 2.75l2.87 5.82 6.43.93-4.65 4.53 1.1 6.4L12 17.4l-5.75 3.03 1.1-6.4L2.7 9.5l6.43-.93L12 2.75z"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+      <path
+        d="M12 2.75l2.87 5.82 6.43.93-4.65 4.53 1.1 6.4L12 17.4l-5.75 3.03 1.1-6.4L2.7 9.5l6.43-.93L12 2.75z"
+        fill="none"
+        stroke="#e11d48"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default function PretragaStanica({ onStationSelected, selectedStation, onClearSelection, auth }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -19,8 +44,6 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   const jePremium = auth?.token && auth?.korisnik?.uloga === 'premium';
-  const punaZvezda = '\u2605';
-  const praznaZvezda = '\u2606';
 
   useEffect(() => {
     if (!jePremium) {
@@ -140,13 +163,16 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
                 <button
                   type="button"
                   onClick={() => handleToggleFavorite(selectedStation.id)}
-                  className="text-xl leading-none text-rose-600"
+                  className="rounded-md p-1 hover:bg-rose-50"
                   title="Dodaj ili ukloni iz omiljenih"
                 >
-                  {favoriteIds.includes(selectedStation.id) ? punaZvezda : praznaZvezda}
+                  <StarIcon filled={favoriteIds.includes(selectedStation.id)} />
                 </button>
               ) : null}
-              <button onClick={onClearSelection} className="text-sm font-semibold text-rose-600">
+              <button
+                onClick={onClearSelection}
+                className="rounded-xl bg-rose text-white px-3 py-1 text-sm font-semibold"
+              >
                 Promeni
               </button>
             </div>
@@ -170,13 +196,16 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
                   <button
                     type="button"
                     onClick={() => handleToggleFavorite(s.id)}
-                    className="text-xl leading-none text-rose-600"
+                    className="rounded-md p-1 hover:bg-rose-50"
                     title="Dodaj ili ukloni iz omiljenih"
                   >
-                    {favoriteIds.includes(s.id) ? punaZvezda : praznaZvezda}
+                    <StarIcon filled={favoriteIds.includes(s.id)} />
                   </button>
                 ) : null}
-                <button onClick={() => handleSelect(s.id)} className="text-sm font-semibold text-rose-600">
+                <button
+                  onClick={() => handleSelect(s.id)}
+                  className="rounded-xl px-3 py-1 text-sm font-semibold border border-rose text-rose"
+                >
                   Detalji
                 </button>
               </div>
