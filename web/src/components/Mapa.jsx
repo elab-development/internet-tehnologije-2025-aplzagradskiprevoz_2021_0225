@@ -4,6 +4,35 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 
 const defaultCenter = [44.8125, 20.4612];
+const DEFAULT_PIN = '#3b82f6';
+const SELECTED_PIN = '#e11d48';
+const BORDER_COLOR = '#be123c';
+
+function createPinIcon(fillColor, borderColor) {
+  return L.divIcon({
+    className: 'custom-pin-icon',
+    iconSize: [26, 36],
+    iconAnchor: [13, 36],
+    popupAnchor: [0, -32],
+    html: `
+      <svg width="26" height="36" viewBox="0 0 26 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M13 1C6.7 1 1.5 6.2 1.5 12.5c0 8.2 8.6 17.3 11.5 22.5 2.9-5.2 11.5-14.3 11.5-22.5C24.5 6.2 19.3 1 13 1z" fill="${fillColor}" stroke="${borderColor}" stroke-width="2"/>
+        <circle cx="13" cy="12.5" r="4.2" fill="${borderColor}" />
+      </svg>
+    `
+  });
+}
+
+const defaultPinIcon = createPinIcon(DEFAULT_PIN, '#1d4ed8');
+const selectedPinIcon = createPinIcon(SELECTED_PIN, '#9f1239');
+
+const routeDotIcon = L.divIcon({
+  className: 'custom-route-dot',
+  iconSize: [10, 10],
+  iconAnchor: [5, 5],
+  popupAnchor: [0, -6],
+  html: '<div style="width:10px;height:10px;border-radius:9999px;background:#ffffff;border:2px solid #be123c;"></div>'
+});
 
 function setupDefaultIcon() {
   delete L.Icon.Default.prototype._getIconUrl;
@@ -40,8 +69,21 @@ export default function Mapa({ stations, selectedStationId, selectedStation, lin
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
-    stations.forEach((s) => {
-      const marker = L.marker([s.lat, s.lon]);
+    const rutaAktivna = Array.isArray(lineStations) && lineStations.length > 0;
+    const prikazStanica = rutaAktivna ? [...lineStations] : [...stations];
+
+    if (
+      rutaAktivna &&
+      selectedStation &&
+      !prikazStanica.some((s) => Number(s.id) === Number(selectedStation.id))
+    ) {
+      prikazStanica.push(selectedStation);
+    }
+
+    prikazStanica.forEach((s) => {
+      const izabrana = Number(s.id) === Number(selectedStationId);
+      const icon = izabrana ? selectedPinIcon : rutaAktivna ? routeDotIcon : defaultPinIcon;
+      const marker = L.marker([s.lat, s.lon], { icon });
       if (s.id === selectedStationId) {
         marker.bindPopup(`<b>${s.name}</b>`).openPopup();
       } else {
@@ -50,7 +92,7 @@ export default function Mapa({ stations, selectedStationId, selectedStation, lin
       marker.addTo(map);
       markersRef.current.push(marker);
     });
-  }, [stations, selectedStationId]);
+  }, [stations, selectedStationId, selectedStation, lineStations]);
 
   useEffect(() => {
     const map = mapRef.current;
