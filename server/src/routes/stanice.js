@@ -1,8 +1,12 @@
 import express from 'express';
+import { zahtevajPrijavu, zahtevajUlogu } from '../middleware/auth.js';
 import {
+  dodajOmiljenuStanicu,
   dohvatiLinijeZaStanicu,
+  dohvatiOmiljeneStaniceZaKorisnika,
   dohvatiStanice,
-  dohvatiStanicuPoId
+  dohvatiStanicuPoId,
+  ukloniOmiljenuStanicu
 } from '../repositories/staniceRepo.js';
 
 const router = express.Router();
@@ -18,6 +22,16 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/omiljene', zahtevajPrijavu, zahtevajUlogu(['premium']), async (req, res) => {
+  try {
+    const rows = await dohvatiOmiljeneStaniceZaKorisnika(req.auth.sub);
+    res.json(rows);
+  } catch (err) {
+    console.error('GET /stanice/omiljene failed', err);
+    res.status(500).json({ error: 'Failed to fetch favorite stations' });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!id) return res.status(400).json({ error: 'Invalid id' });
@@ -30,6 +44,36 @@ router.get('/:id', async (req, res) => {
   } catch (err) {
     console.error('GET /stanice/:id failed', err);
     res.status(500).json({ error: 'Failed to fetch station' });
+  }
+});
+
+router.post('/:id/omiljena', zahtevajPrijavu, zahtevajUlogu(['premium']), async (req, res) => {
+  const id = Number(req.params.id);
+  if (!id) return res.status(400).json({ error: 'Invalid id' });
+
+  try {
+    const station = await dohvatiStanicuPoId(id);
+    if (!station) return res.status(404).json({ error: 'Not found' });
+    const result = await dodajOmiljenuStanicu(req.auth.sub, id);
+    if (!result) return res.status(404).json({ error: 'Passenger profile not found' });
+    return res.json({ ok: true, favorites: result.omiljenestanice || [] });
+  } catch (err) {
+    console.error('POST /stanice/:id/omiljena failed', err);
+    return res.status(500).json({ error: 'Failed to add favorite station' });
+  }
+});
+
+router.delete('/:id/omiljena', zahtevajPrijavu, zahtevajUlogu(['premium']), async (req, res) => {
+  const id = Number(req.params.id);
+  if (!id) return res.status(400).json({ error: 'Invalid id' });
+
+  try {
+    const result = await ukloniOmiljenuStanicu(req.auth.sub, id);
+    if (!result) return res.status(404).json({ error: 'Passenger profile not found' });
+    return res.json({ ok: true, favorites: result.omiljenestanice || [] });
+  } catch (err) {
+    console.error('DELETE /stanice/:id/omiljena failed', err);
+    return res.status(500).json({ error: 'Failed to remove favorite station' });
   }
 });
 

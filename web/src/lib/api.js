@@ -22,6 +22,41 @@ export async function dohvatiTrasuLinije(id, stationId) {
   return res.json();
 }
 
+export async function dohvatiOmiljeneStanice(token) {
+  const res = await fetch(`${baseUrl}/stanice/omiljene`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Neuspesno dohvatanje omiljenih stanica');
+  }
+  return data;
+}
+
+export async function dodajOmiljenuStanicu(id, token) {
+  const res = await fetch(`${baseUrl}/stanice/${id}/omiljena`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Neuspesno dodavanje omiljene stanice');
+  }
+  return data;
+}
+
+export async function ukloniOmiljenuStanicu(id, token) {
+  const res = await fetch(`${baseUrl}/stanice/${id}/omiljena`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Neuspesno uklanjanje omiljene stanice');
+  }
+  return data;
+}
+
 export async function dohvatiStatusGuzve(id, token) {
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
   const res = await fetch(`${baseUrl}/linije/${id}/guzva`, { headers });

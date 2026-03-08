@@ -77,3 +77,57 @@ export async function dohvatiLinijeZaStanicu(id) {
   );
   return rows;
 }
+
+export async function dohvatiOmiljeneStaniceZaKorisnika(korisnikId) {
+  const { rows } = await pool.query(
+    `
+    SELECT
+      s.brStanice AS id,
+      s.code,
+      s.external_id,
+      s.nazivStanice AS name,
+      s.lat,
+      s.lon,
+      CASE
+        WHEN s.code IS NULL OR s.code = '' THEN NULL
+        WHEN s.external_id IS NOT NULL AND s.code = s.external_id THEN NULL
+        ELSE s.code
+      END AS display_code
+    FROM Putnik p
+    JOIN Stanica s ON s.brStanice = ANY(p.omiljeneStanice)
+    WHERE p.korisnikId = $1
+    ORDER BY s.nazivStanice
+    `,
+    [korisnikId]
+  );
+  return rows;
+}
+
+export async function dodajOmiljenuStanicu(korisnikId, stanicaId) {
+  const { rows } = await pool.query(
+    `
+    UPDATE Putnik
+    SET omiljeneStanice = CASE
+      WHEN $2 = ANY(omiljeneStanice) THEN omiljeneStanice
+      ELSE array_append(omiljeneStanice, $2)
+    END
+    WHERE korisnikId = $1
+    RETURNING omiljeneStanice
+    `,
+    [korisnikId, stanicaId]
+  );
+  return rows[0] || null;
+}
+
+export async function ukloniOmiljenuStanicu(korisnikId, stanicaId) {
+  const { rows } = await pool.query(
+    `
+    UPDATE Putnik
+    SET omiljeneStanice = array_remove(omiljeneStanice, $2)
+    WHERE korisnikId = $1
+    RETURNING omiljeneStanice
+    `,
+    [korisnikId, stanicaId]
+  );
+  return rows[0] || null;
+}

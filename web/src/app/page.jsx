@@ -88,6 +88,7 @@ export default function HomePage() {
               onStationSelected={handleStationSelected}
               selectedStation={selectedStation}
               onClearSelection={handleClearSelection}
+              auth={auth}
             />
 
             {selectedStation ? (
