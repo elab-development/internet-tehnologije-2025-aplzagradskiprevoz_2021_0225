@@ -60,9 +60,6 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
                   <span className="text-xs text-rose-500">({selectedStation.display_code})</span>
                 ) : null}
               </div>
-              <div className="text-xs text-slate-500">
-                {selectedStation.lat.toFixed(4)}, {selectedStation.lon.toFixed(4)}
-              </div>
             </div>
             <button
               onClick={onClearSelection}
@@ -84,7 +81,6 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
                     <span className="text-xs text-rose-500">({s.display_code})</span>
                   ) : null}
                 </div>
-                <div className="text-xs text-slate-500">{s.lat.toFixed(4)}, {s.lon.toFixed(4)}</div>
               </div>
               <button
                 onClick={() => handleSelect(s.id)}

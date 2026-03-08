@@ -78,9 +78,6 @@ export default function HomePage() {
         <header className="relative z-[1200] mb-6 flex items-start justify-between gap-4">
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold text-ink">Bus Minus</h1>
-            <a href="/vozac" className="inline-block text-sm font-semibold text-rose-600 hover:underline">
-              Vozac portal
-            </a>
           </div>
           <AuthPanel auth={auth} onAuthChange={handleAuthChange} onLogout={handleLogout} />
         </header>

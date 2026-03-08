@@ -80,10 +80,7 @@ export default function VozacPage() {
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-3xl space-y-6">
         <header className="rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
-          <h1 className="text-3xl font-semibold text-ink">Vozac portal</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Test nalozi: vozac1, vozac2, vozac3, vozac4, vozac5 (lozinka je ista kao korisnicko ime).
-          </p>
+          <h1 className="text-3xl font-semibold text-ink">Vozač portal</h1>
         </header>
 
         {!auth?.token ? (
@@ -153,7 +150,7 @@ export default function VozacPage() {
                 type="button"
                 className="rounded-xl bg-rose px-4 py-2 font-semibold text-white"
               >
-                Sacuvaj status
+                Sačuvaj status
               </button>
             </div>
 

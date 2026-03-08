@@ -38,11 +38,10 @@ export default function DetaljiLinije({ lines, onLineSelected, selectedStationId
               </div>
               <button
                 onClick={() => handleLine(l.id)}
-                className={`rounded-xl px-3 py-1 text-sm font-semibold ${
-                  selectedLineId === l.id ? 'bg-rose text-white' : 'border border-rose text-rose'
-                }`}
+                className={`rounded-xl px-3 py-1 text-sm font-semibold ${selectedLineId === l.id ? 'bg-rose text-white' : 'border border-rose text-rose'
+                  }`}
               >
-                Prikazi trasu
+                Prikaži trasu
               </button>
             </li>
           ))}
