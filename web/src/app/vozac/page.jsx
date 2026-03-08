@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import {
   dohvatiTrasuLinije,
   dohvatiVozacevuLiniju,
+  promeniVozacevuLozinku,
   prijaviVozaca,
   upisiVozacevuGuzvu
 } from '../../lib/api';
@@ -34,6 +35,8 @@ export default function VozacPage() {
   const [lineShape, setLineShape] = useState(null);
   const [lineStations, setLineStations] = useState([]);
   const [izabraniStatus, setIzabraniStatus] = useState('mala');
+  const [novaLozinka, setNovaLozinka] = useState('');
+  const [potvrdaLozinke, setPotvrdaLozinke] = useState('');
   const [poruka, setPoruka] = useState('');
   const [greska, setGreska] = useState('');
 
@@ -43,7 +46,9 @@ export default function VozacPage() {
     try {
       const data = JSON.parse(sacuvano);
       setAuth(data);
-      ucitajLiniju(data.token);
+      if (!data.mustChangePassword) {
+        ucitajLiniju(data.token);
+      }
     } catch (err) {
       localStorage.removeItem('vozacAuth');
     }
@@ -76,9 +81,37 @@ export default function VozacPage() {
       const data = await prijaviVozaca({ korisnickoIme, lozinka });
       setAuth(data);
       localStorage.setItem('vozacAuth', JSON.stringify(data));
-      await ucitajLiniju(data.token);
+      if (!data.mustChangePassword) {
+        await ucitajLiniju(data.token);
+      }
     } catch (err) {
       setGreska(err.message || 'Prijava nije uspela');
+    }
+  }
+
+  async function handlePromenaLozinke(e) {
+    e.preventDefault();
+    if (!auth?.token) return;
+    setGreska('');
+    setPoruka('');
+    try {
+      const data = await promeniVozacevuLozinku(
+        { novaLozinka, potvrdaLozinke: potvrdaLozinke },
+        auth.token
+      );
+      const noviAuth = {
+        ...auth,
+        token: data.token,
+        mustChangePassword: false
+      };
+      setAuth(noviAuth);
+      localStorage.setItem('vozacAuth', JSON.stringify(noviAuth));
+      setNovaLozinka('');
+      setPotvrdaLozinke('');
+      setPoruka('Lozinka je uspesno promenjena.');
+      await ucitajLiniju(data.token);
+    } catch (err) {
+      setGreska(err.message || 'Promena lozinke nije uspela');
     }
   }
 
@@ -136,6 +169,36 @@ export default function VozacPage() {
               </button>
             </form>
           </section>
+        ) : auth?.mustChangePassword ? (
+          <section className="rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
+            <h2 className="text-lg font-semibold">Obavezna promena šifre</h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Pre nastavka rada unesite novu i potvrdite novu šifru.
+            </p>
+            <form onSubmit={handlePromenaLozinke} className="mt-4 space-y-3">
+              <input
+                className="w-full rounded-xl border border-rose/30 px-4 py-3"
+                type="password"
+                placeholder="Nova lozinka"
+                value={novaLozinka}
+                onChange={(e) => setNovaLozinka(e.target.value)}
+                required
+              />
+              <input
+                className="w-full rounded-xl border border-rose/30 px-4 py-3"
+                type="password"
+                placeholder="Potvrda nove lozinke"
+                value={potvrdaLozinke}
+                onChange={(e) => setPotvrdaLozinke(e.target.value)}
+                required
+              />
+              {greska ? <div className="text-sm text-red-600">{greska}</div> : null}
+              {poruka ? <div className="text-sm text-emerald-700">{poruka}</div> : null}
+              <button className="rounded-xl bg-rose px-4 py-2 font-semibold text-white" type="submit">
+                Sačuvaj novu šifru
+              </button>
+            </form>
+          </section>
         ) : (
           <section className="rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
             <div className="flex items-center justify-between">
@@ -185,7 +248,7 @@ export default function VozacPage() {
 
             {linija ? (
               <div className="mt-4 rounded-2xl border border-rose/20 bg-white/70 p-3">
-                <div className="mb-2 text-sm font-semibold text-slate-700">Trasa danasnje linije</div>
+                <div className="mb-2 text-sm font-semibold text-slate-700">Trasa današnje linije</div>
                 <Mapa
                   stations={[]}
                   selectedStationId={null}

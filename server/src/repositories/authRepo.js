@@ -60,6 +60,11 @@ export async function osigurajPreddefinisaneVozace() {
   const client = await pool.connect();
   try {
     await client.query(`
+      ALTER TABLE Vozac
+      ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN NOT NULL DEFAULT FALSE
+    `);
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS vozac_dnevna_linija (
         id SERIAL PRIMARY KEY,
         vozac_id INT NOT NULL REFERENCES Vozac(idVozaca) ON DELETE CASCADE,
@@ -106,11 +111,35 @@ export async function osigurajPreddefinisaneVozace() {
       if (!vozacRes.rows[0]) {
         await client.query(
           `
-            INSERT INTO Vozac (korisnikId, brojLicence, jeAktivan)
-            VALUES ($1, $2, TRUE)
+            INSERT INTO Vozac (korisnikId, brojLicence, jeAktivan, must_change_password)
+            VALUES ($1, $2, TRUE, TRUE)
           `,
           [korisnikId, vozac.brojLicence]
         );
+      } else {
+        const korisnikSaLozinkom = await client.query(
+          `
+            SELECT lozinka
+            FROM Korisnik
+            WHERE idKorisnika = $1
+          `,
+          [korisnikId]
+        );
+        const hashLozinke = korisnikSaLozinkom.rows[0]?.lozinka || '';
+        const josUvekPodrazumevana = hashLozinke
+          ? await bcrypt.compare(vozac.password, hashLozinke)
+          : false;
+
+        if (josUvekPodrazumevana) {
+          await client.query(
+            `
+              UPDATE Vozac
+              SET must_change_password = TRUE
+              WHERE korisnikId = $1
+            `,
+            [korisnikId]
+          );
+        }
       }
     }
   } finally {

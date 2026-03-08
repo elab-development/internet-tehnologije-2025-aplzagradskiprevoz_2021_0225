@@ -103,3 +103,19 @@ export async function upisiVozacevuGuzvu(status, token) {
   }
   return data;
 }
+
+export async function promeniVozacevuLozinku(payload, token) {
+  const res = await fetch(`${baseUrl}/vozac/promeni-lozinku`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Promena lozinke nije uspela');
+  }
+  return data;
+}

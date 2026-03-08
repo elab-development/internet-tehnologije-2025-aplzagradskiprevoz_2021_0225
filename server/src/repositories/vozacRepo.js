@@ -21,7 +21,8 @@ export async function pronadjiVozacaPoKorisnickomImenu(korisnickoIme) {
         k.korisnickoIme AS username,
         k.lozinka AS password_hash,
         v.idVozaca AS vozac_id,
-        v.brojLicence AS broj_licence
+        v.brojLicence AS broj_licence,
+        v.must_change_password
       FROM Korisnik k
       JOIN Vozac v ON v.korisnikId = k.idKorisnika
       WHERE LOWER(k.korisnickoIme) = LOWER($1) AND v.jeAktivan = TRUE
@@ -89,4 +90,36 @@ export async function upisiVozacevStatusGuzve(vozacId, status, datum = danasnjiD
   if (!linija) return null;
   await upisiStatusGuzveLinije(linija.line_id, status);
   return linija;
+}
+
+export async function promeniLozinkuVozaca({ userId, vozacId, novaLozinkaHash }) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    await client.query(
+      `
+        UPDATE Korisnik
+        SET lozinka = $2
+        WHERE idKorisnika = $1
+      `,
+      [userId, novaLozinkaHash]
+    );
+
+    await client.query(
+      `
+        UPDATE Vozac
+        SET must_change_password = FALSE
+        WHERE idVozaca = $1
+      `,
+      [vozacId]
+    );
+
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
