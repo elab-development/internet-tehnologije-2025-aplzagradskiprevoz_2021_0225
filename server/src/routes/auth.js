@@ -1,8 +1,11 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { zahtevajPrijavu } from '../middleware/auth.js';
 import {
   kreirajKorisnika,
+  promeniLozinkuKorisnika,
+  pronadjiKorisnikaPoId,
   pronadjiKorisnikaPoKorisnickomImenu
 } from '../repositories/authRepo.js';
 
@@ -93,6 +96,44 @@ router.post('/login', async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ error: 'Prijava nije uspela' });
+  }
+});
+
+router.post('/promeni-lozinku', zahtevajPrijavu, async (req, res) => {
+  const staraLozinka = String(req.body.staraLozinka || '');
+  const novaLozinka = String(req.body.novaLozinka || '');
+  const potvrdaLozinke = String(req.body.potvrdaLozinke || '');
+
+  if (!staraLozinka || !novaLozinka || !potvrdaLozinke) {
+    return res.status(400).json({ error: 'Sva polja su obavezna' });
+  }
+  if (novaLozinka.length < 6) {
+    return res.status(400).json({ error: 'Lozinka mora imati bar 6 karaktera' });
+  }
+  if (novaLozinka !== potvrdaLozinke) {
+    return res.status(400).json({ error: 'Lozinke se ne poklapaju' });
+  }
+
+  try {
+    const korisnik = await pronadjiKorisnikaPoId(req.auth.sub);
+    if (!korisnik) {
+      return res.status(404).json({ error: 'Korisnik nije pronađen' });
+    }
+
+    const validnaStara = await bcrypt.compare(staraLozinka, korisnik.password_hash);
+    if (!validnaStara) {
+      return res.status(401).json({ error: 'Stara lozinka nije ispravna' });
+    }
+    const istaKaoPrethodna = await bcrypt.compare(novaLozinka, korisnik.password_hash);
+    if (istaKaoPrethodna) {
+      return res.status(400).json({ error: 'Nova lozinka mora biti drugačija od prethodne' });
+    }
+
+    const novaLozinkaHash = await bcrypt.hash(novaLozinka, 10);
+    await promeniLozinkuKorisnika(korisnik.id, novaLozinkaHash);
+    return res.json({ ok: true });
+  } catch (err) {
+    return res.status(500).json({ error: 'Promena lozinke nije uspela' });
   }
 });
 

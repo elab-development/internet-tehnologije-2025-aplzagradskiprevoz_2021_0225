@@ -97,6 +97,22 @@ export async function prijaviKorisnika(payload) {
   return data;
 }
 
+export async function promeniKorisnickuLozinku(payload, token) {
+  const res = await fetch(`${baseUrl}/auth/promeni-lozinku`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Promena lozinke nije uspela');
+  }
+  return data;
+}
+
 export async function prijaviVozaca(payload) {
   const res = await fetch(`${baseUrl}/vozac/login`, {
     method: 'POST',

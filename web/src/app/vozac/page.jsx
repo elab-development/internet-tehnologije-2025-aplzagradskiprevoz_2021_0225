@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import {
   dohvatiTrasuLinije,
   dohvatiVozacevuLiniju,
+  promeniKorisnickuLozinku,
   promeniVozacevuLozinku,
   prijaviVozaca,
   upisiVozacevuGuzvu
@@ -35,10 +36,20 @@ export default function VozacPage() {
   const [lineShape, setLineShape] = useState(null);
   const [lineStations, setLineStations] = useState([]);
   const [izabraniStatus, setIzabraniStatus] = useState('mala');
+
   const [novaLozinka, setNovaLozinka] = useState('');
   const [potvrdaLozinke, setPotvrdaLozinke] = useState('');
+
+  const [staraLozinkaRedovna, setStaraLozinkaRedovna] = useState('');
+  const [novaLozinkaRedovna, setNovaLozinkaRedovna] = useState('');
+  const [potvrdaLozinkeRedovna, setPotvrdaLozinkeRedovna] = useState('');
+
   const [poruka, setPoruka] = useState('');
   const [greska, setGreska] = useState('');
+  const [porukaLozinka, setPorukaLozinka] = useState('');
+  const [greskaLozinka, setGreskaLozinka] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [openChangePasswordModal, setOpenChangePasswordModal] = useState(false);
 
   useEffect(() => {
     const sacuvano = localStorage.getItem('vozacAuth');
@@ -58,6 +69,7 @@ export default function VozacPage() {
     const data = await dohvatiVozacevuLiniju(token);
     setLinija(data.line);
     setStatusGuzve(data.status || 'nepoznato');
+
     if (data?.line?.line_id) {
       try {
         const trasa = await dohvatiTrasuLinije(data.line.line_id);
@@ -89,14 +101,14 @@ export default function VozacPage() {
     }
   }
 
-  async function handlePromenaLozinke(e) {
+  async function handleObaveznaPromenaLozinke(e) {
     e.preventDefault();
     if (!auth?.token) return;
     setGreska('');
     setPoruka('');
     try {
       const data = await promeniVozacevuLozinku(
-        { novaLozinka, potvrdaLozinke: potvrdaLozinke },
+        { novaLozinka, potvrdaLozinke },
         auth.token
       );
       const noviAuth = {
@@ -128,6 +140,30 @@ export default function VozacPage() {
     }
   }
 
+  async function handleRedovnaPromenaLozinke(e) {
+    e.preventDefault();
+    if (!auth?.token) return;
+    setPorukaLozinka('');
+    setGreskaLozinka('');
+    try {
+      await promeniKorisnickuLozinku(
+        {
+          staraLozinka: staraLozinkaRedovna,
+          novaLozinka: novaLozinkaRedovna,
+          potvrdaLozinke: potvrdaLozinkeRedovna
+        },
+        auth.token
+      );
+      setStaraLozinkaRedovna('');
+      setNovaLozinkaRedovna('');
+      setPotvrdaLozinkeRedovna('');
+      setPorukaLozinka('Lozinka je uspesno promenjena.');
+      setOpenChangePasswordModal(false);
+    } catch (err) {
+      setGreskaLozinka(err.message || 'Promena lozinke nije uspela');
+    }
+  }
+
   function handleOdjava() {
     setAuth(null);
     setLinija(null);
@@ -145,7 +181,7 @@ export default function VozacPage() {
         </header>
 
         {!auth?.token ? (
-          <section className="rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
+          <section className="relative rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
             <h2 className="text-lg font-semibold">Prijava vozaca</h2>
             <form onSubmit={handleLogin} className="mt-4 space-y-3">
               <input
@@ -170,12 +206,12 @@ export default function VozacPage() {
             </form>
           </section>
         ) : auth?.mustChangePassword ? (
-          <section className="rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
+          <section className="relative rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
             <h2 className="text-lg font-semibold">Obavezna promena šifre</h2>
             <p className="mt-2 text-sm text-slate-600">
-              Pre nastavka rada unesite novu i potvrdite novu šifru.
+              Pre nastavka rada unesite novu sifru dva puta.
             </p>
-            <form onSubmit={handlePromenaLozinke} className="mt-4 space-y-3">
+            <form onSubmit={handleObaveznaPromenaLozinke} className="mt-4 space-y-3">
               <input
                 className="w-full rounded-xl border border-rose/30 px-4 py-3"
                 type="password"
@@ -195,7 +231,7 @@ export default function VozacPage() {
               {greska ? <div className="text-sm text-red-600">{greska}</div> : null}
               {poruka ? <div className="text-sm text-emerald-700">{poruka}</div> : null}
               <button className="rounded-xl bg-rose px-4 py-2 font-semibold text-white" type="submit">
-                Sačuvaj novu šifru
+                Sačuvaj novu sifru
               </button>
             </form>
           </section>
@@ -204,13 +240,41 @@ export default function VozacPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Dodeljena linija za danas</h2>
               <button
-                onClick={handleOdjava}
-                className="rounded-xl border border-rose px-3 py-1 text-sm font-semibold text-rose"
+                onClick={() => setMenuOpen((v) => !v)}
+                className={`rounded-lg px-2 py-1 ${menuOpen ? 'bg-rose text-white' : 'text-rose-600 hover:bg-rose-50'
+                  }`}
                 type="button"
+                aria-label="Meni"
               >
-                Odjava
+                <span className="flex flex-col items-center justify-center gap-[2px]">
+                  <span className="h-1 w-1 rounded-full bg-current" />
+                  <span className="h-1 w-1 rounded-full bg-current" />
+                  <span className="h-1 w-1 rounded-full bg-current" />
+                </span>
               </button>
             </div>
+            {menuOpen ? (
+              <div className="absolute right-10 mt-1 z-20 w-44 rounded-xl border border-rose/20 bg-white p-1 shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setOpenChangePasswordModal(true);
+                    setGreskaLozinka('');
+                  }}
+                  className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-700 hover:bg-rose-50"
+                >
+                  Promena šifre
+                </button>
+                <button
+                  type="button"
+                  onClick={handleOdjava}
+                  className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-700 hover:bg-rose-50"
+                >
+                  Odjava
+                </button>
+              </div>
+            ) : null}
 
             {linija ? (
               <div className="mt-4 rounded-xl border border-slate-200 bg-white px-4 py-3">
@@ -248,7 +312,7 @@ export default function VozacPage() {
 
             {linija ? (
               <div className="mt-4 rounded-2xl border border-rose/20 bg-white/70 p-3">
-                <div className="mb-2 text-sm font-semibold text-slate-700">Trasa današnje linije</div>
+                <div className="mb-2 text-sm font-semibold text-slate-700">Trasa danasnje linije</div>
                 <Mapa
                   stations={[]}
                   selectedStationId={null}
@@ -258,9 +322,60 @@ export default function VozacPage() {
                 />
               </div>
             ) : null}
+
+            {porukaLozinka ? <div className="mt-3 text-sm text-emerald-700">{porukaLozinka}</div> : null}
           </section>
         )}
       </div>
+      {openChangePasswordModal ? (
+        <div className="fixed inset-0 z-[1600] flex items-center justify-center bg-black/35 p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-rose/20 bg-white p-4 shadow-xl">
+            <div className="mb-3 text-base font-semibold text-ink">Promena šifre</div>
+            <form onSubmit={handleRedovnaPromenaLozinke} className="space-y-2">
+              <input
+                className="w-full rounded-xl border border-rose/30 px-3 py-2"
+                type="password"
+                placeholder="Stara lozinka"
+                value={staraLozinkaRedovna}
+                onChange={(e) => setStaraLozinkaRedovna(e.target.value)}
+                required
+              />
+              <input
+                className="w-full rounded-xl border border-rose/30 px-3 py-2"
+                type="password"
+                placeholder="Nova lozinka"
+                value={novaLozinkaRedovna}
+                onChange={(e) => setNovaLozinkaRedovna(e.target.value)}
+                required
+              />
+              <input
+                className="w-full rounded-xl border border-rose/30 px-3 py-2"
+                type="password"
+                placeholder="Potvrda nove lozinke"
+                value={potvrdaLozinkeRedovna}
+                onChange={(e) => setPotvrdaLozinkeRedovna(e.target.value)}
+                required
+              />
+              {greskaLozinka ? <div className="text-sm text-red-600">{greskaLozinka}</div> : null}
+              <div className="flex justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setOpenChangePasswordModal(false)}
+                  className="rounded-xl border border-rose px-3 py-2 text-sm font-semibold text-rose"
+                >
+                  Otkazi
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-rose px-4 py-2 text-sm font-semibold text-white"
+                >
+                  Sačuvaj
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

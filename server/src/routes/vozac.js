@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { zahtevajPrijavu, zahtevajUlogu } from '../middleware/auth.js';
+import { pronadjiKorisnikaPoId } from '../repositories/authRepo.js';
 import {
   dodeliDnevnuLinijuAkoNedostaje,
   dohvatiVozacevStatusGuzve,
@@ -127,6 +128,15 @@ router.post('/promeni-lozinku', zahtevajPrijavu, zahtevajUlogu(['vozac']), async
   }
 
   try {
+    const korisnik = await pronadjiKorisnikaPoId(req.auth.sub);
+    if (!korisnik) {
+      return res.status(404).json({ error: 'Korisnik nije pronađen' });
+    }
+    const istaKaoPrethodna = await bcrypt.compare(novaLozinka, korisnik.password_hash);
+    if (istaKaoPrethodna) {
+      return res.status(400).json({ error: 'Nova lozinka mora biti drugačija od prethodne' });
+    }
+
     const novaLozinkaHash = await bcrypt.hash(novaLozinka, 10);
     await promeniLozinkuVozaca({
       userId: req.auth.sub,

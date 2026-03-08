@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'BG Prevoz - MVP',
+  title: 'Bus Minus',
   description: 'Veb aplikacija za gradski prevoz u Beogradu'
 };
 

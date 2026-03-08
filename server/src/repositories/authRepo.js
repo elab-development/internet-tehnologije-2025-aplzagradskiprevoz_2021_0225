@@ -14,6 +14,18 @@ export async function pronadjiKorisnikaPoKorisnickomImenu(korisnickoIme) {
   return rows[0] || null;
 }
 
+export async function pronadjiKorisnikaPoId(korisnikId) {
+  const { rows } = await pool.query(
+    `
+      SELECT idKorisnika AS id, korisnickoIme AS username, lozinka AS password_hash, uloga AS role
+      FROM Korisnik
+      WHERE idKorisnika = $1
+    `,
+    [korisnikId]
+  );
+  return rows[0] || null;
+}
+
 export async function kreirajKorisnika({ korisnickoIme, lozinkaHash, uloga }) {
   const client = await pool.connect();
   try {
@@ -142,6 +154,35 @@ export async function osigurajPreddefinisaneVozace() {
         }
       }
     }
+  } finally {
+    client.release();
+  }
+}
+
+export async function promeniLozinkuKorisnika(korisnikId, novaLozinkaHash) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(
+      `
+        UPDATE Korisnik
+        SET lozinka = $2
+        WHERE idKorisnika = $1
+      `,
+      [korisnikId, novaLozinkaHash]
+    );
+    await client.query(
+      `
+        UPDATE Vozac
+        SET must_change_password = FALSE
+        WHERE korisnikId = $1
+      `,
+      [korisnikId]
+    );
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
   } finally {
     client.release();
   }
