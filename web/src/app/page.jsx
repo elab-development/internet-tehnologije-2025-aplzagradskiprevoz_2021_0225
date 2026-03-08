@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import PretragaStanica from '../components/PretragaStanica';
 import DetaljiLinije from '../components/DetaljiLinije';
 import AuthPanel from '../components/AuthPanel';
-import { dohvatiTrasuLinije } from '../lib/api';
+import { dohvatiStanicu, dohvatiTrasuLinije } from '../lib/api';
 
 const Mapa = dynamic(() => import('../components/Mapa'), { ssr: false });
 
@@ -52,6 +52,12 @@ export default function HomePage() {
   function handleLineSelected(data) {
     setLineShape(normalizeShape(data.shape));
     setLineStations(data.stations || []);
+  }
+
+  async function handleMapStationClick(stationId) {
+    if (!stationId) return;
+    const data = await dohvatiStanicu(stationId);
+    await handleStationSelected(data);
   }
 
   function handleClearSelection() {
@@ -108,6 +114,7 @@ export default function HomePage() {
               selectedStation={selectedStation}
               lineShape={lineShape}
               lineStations={lineStations}
+              onStationClick={handleMapStationClick}
             />
             {lineStations.length > 0 ? (
               <div className="mt-4">

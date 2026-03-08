@@ -43,7 +43,14 @@ function setupDefaultIcon() {
   });
 }
 
-export default function Mapa({ stations, selectedStationId, selectedStation, lineShape, lineStations }) {
+export default function Mapa({
+  stations,
+  selectedStationId,
+  selectedStation,
+  lineShape,
+  lineStations,
+  onStationClick
+}) {
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const lineRef = useRef(null);
@@ -84,6 +91,11 @@ export default function Mapa({ stations, selectedStationId, selectedStation, lin
       const izabrana = Number(s.id) === Number(selectedStationId);
       const icon = izabrana ? selectedPinIcon : rutaAktivna ? routeDotIcon : defaultPinIcon;
       const marker = L.marker([s.lat, s.lon], { icon });
+      marker.on('click', () => {
+        if (typeof onStationClick === 'function') {
+          onStationClick(s.id);
+        }
+      });
       if (s.id === selectedStationId) {
         marker.bindPopup(`<b>${s.name}</b>`).openPopup();
       } else {
@@ -92,7 +104,7 @@ export default function Mapa({ stations, selectedStationId, selectedStation, lin
       marker.addTo(map);
       markersRef.current.push(marker);
     });
-  }, [stations, selectedStationId, selectedStation, lineStations]);
+  }, [stations, selectedStationId, selectedStation, lineStations, onStationClick]);
 
   useEffect(() => {
     const map = mapRef.current;
