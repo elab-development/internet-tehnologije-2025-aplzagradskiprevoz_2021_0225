@@ -119,7 +119,7 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
           type="submit"
           className="rounded-2xl bg-rose text-white px-5 py-3 font-semibold hover:bg-crimson transition"
         >
-          Pretrazi
+          Pretraži
         </button>
       </form>
 
@@ -128,18 +128,16 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
           <button
             type="button"
             onClick={() => setShowFavoritesOnly(false)}
-            className={`rounded-xl px-3 py-1 text-sm font-semibold ${
-              !showFavoritesOnly ? 'bg-rose text-white' : 'border border-rose text-rose'
-            }`}
+            className={`rounded-xl px-3 py-1 text-sm font-semibold ${!showFavoritesOnly ? 'bg-rose text-white' : 'border border-rose text-rose'
+              }`}
           >
             Rezultati
           </button>
           <button
             type="button"
             onClick={() => setShowFavoritesOnly(true)}
-            className={`rounded-xl px-3 py-1 text-sm font-semibold ${
-              showFavoritesOnly ? 'bg-rose text-white' : 'border border-rose text-rose'
-            }`}
+            className={`rounded-xl px-3 py-1 text-sm font-semibold ${showFavoritesOnly ? 'bg-rose text-white' : 'border border-rose text-rose'
+              }`}
           >
             Omiljene
           </button>

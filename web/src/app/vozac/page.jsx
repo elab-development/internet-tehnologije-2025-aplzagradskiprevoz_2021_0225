@@ -177,7 +177,7 @@ export default function VozacPage() {
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-3xl space-y-6">
         <header className="rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
-          <h1 className="text-3xl font-semibold text-ink">Vozac portal</h1>
+          <h1 className="text-3xl font-semibold text-ink">Vozač portal</h1>
         </header>
 
         {!auth?.token ? (
@@ -312,7 +312,7 @@ export default function VozacPage() {
 
             {linija ? (
               <div className="mt-4 rounded-2xl border border-rose/20 bg-white/70 p-3">
-                <div className="mb-2 text-sm font-semibold text-slate-700">Trasa danasnje linije</div>
+                <div className="mb-2 text-sm font-semibold text-slate-700">Trasa današnje linije</div>
                 <Mapa
                   stations={[]}
                   selectedStationId={null}
