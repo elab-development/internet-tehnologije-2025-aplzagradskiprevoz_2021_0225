@@ -1,57 +1,81 @@
-# Veb aplikacija za gradski prevoz u Beogradu (MVP)
+# Veb aplikacija za gradski prevoz u Beogradu
 
-MVP aplikacije omogucava:
-- pretragu stanica po nazivu
-- prikaz informacija o stanici
-- prikaz linija koje staju na stanici
-- prikaz stanica i trase linije na mapi (Leaflet + OpenStreetMap)
-- pregled trenutnog statusa popunjenosti linije (demo)
+## Opis
+Aplikacija omogucava:
+- pretragu stanica i prikaz linija na stanici
+- prikaz trase linije na mapi (Leaflet + OpenStreetMap)
+- klik na stanicu na mapi za promenu aktivne stanice
+- prikaz statusa guzve po liniji (samo prijavljen korisnik)
+- premium naloge (registracija + login)
+- omiljene stanice za premium korisnike (zvezdica + poseban prikaz "Omiljene")
+- vozac portal na `/vozac`:
+  - login vozaca
+  - obavezna promena lozinke na prvom loginu
+  - dodeljena dnevna linija
+  - upis statusa guzve samo za dodeljenu liniju
+  - redovna promena lozinke
 
-## Struktura
-- `web/` Next.js (React + Tailwind)
-- `server/` Express REST API
-- `docker-compose.yml` Postgres + PostGIS
+## Tehnologije
+- `web/`: Next.js + React + Tailwind
+- `server/`: Node.js + Express + pg
+- `db`: PostgreSQL + PostGIS (Docker)
 
 ## Pokretanje (lokalno)
 
-1) Pokreni bazu
+### 1) Podesi env fajlove
+
+`web/.env.local`:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4000
+```
+
+### 2) Pokreni bazu
 ```bash
 docker compose up -d db
 ```
-Pre pokretanja kopiraj `.env.example` u `.env` i unesi kredencijale za bazu.
 
-2) Pokreni backend
+### 3) Pokreni backend
 ```bash
 cd server
-cp .env.example .env
 npm install
 npm run dev
 ```
-Backend radi na `http://localhost:4000`.
+Backend: `http://localhost:4000`
 
-3) Pokreni frontend
+### 4) Pokreni frontend
 ```bash
 cd web
-cp .env.example .env.local
 npm install
 npm run dev
 ```
-Frontend radi na `http://localhost:3000`.
+Frontend: `http://localhost:3000`
 
-## API rute (osnovno)
+## API rute
+
+### Health
 - `GET /health`
+
+### Auth (premium korisnik)
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/promeni-lozinku` (zahteva Bearer token)
+
+### Vozac
+- `POST /vozac/login`
+- `GET /vozac/moja-linija` (vozac token)
+- `POST /vozac/moja-linija/guzva` (vozac token)
+- `POST /vozac/promeni-lozinku` (vozac token, prvi login flow)
+
+### Stanice
 - `GET /stanice?query=...`
 - `GET /stanice/:id`
 - `GET /stanice/:id/linije`
+- `GET /stanice/omiljene` (premium token)
+- `POST /stanice/:id/omiljena` (premium token)
+- `DELETE /stanice/:id/omiljena` (premium token)
+
+### Linije
 - `GET /linije?query=...`
 - `GET /linije/:id/trasa`
-- `GET /linije/:id/guzva`
-- `POST /linije/:id/guzva` `{ "status": "nema|mala|srednja|velika" }`
-
-## Demo scenario
-
-1. Korisnik pretražuje stanicu po nazivu.
-2. Aplikacija prikazuje detalje stanice.
-3. Prikazuju se linije koje staju na stanici.
-4. Klikom na liniju prikazuje se trasa na mapi.
-5. Može se videti i demo status popunjenosti linije.
+- `GET /linije/:id/guzva` (prijavljen korisnik)
+- `POST /linije/:id/guzva` (vozac token, samo dodeljena linija)

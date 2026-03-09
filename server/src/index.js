@@ -25,7 +25,7 @@ app.use('/vozac', vozacRouter);
 const port = Number(process.env.PORT || 4000);
 osigurajPreddefinisaneVozace()
   .catch((err) => {
-    console.error('Neuspesna inicijalizacija vozača', err);
+    console.error('Neuspesna inicijalizacija vozaca', err);
   })
   .finally(() => {
     app.listen(port, () => {
