@@ -7,7 +7,7 @@ Aplikacija omogucava:
 - klik na stanicu na mapi za promenu aktivne stanice
 - prikaz statusa guzve po liniji (samo prijavljen korisnik)
 - premium naloge (registracija + login)
-- omiljene stanice za premium korisnike (zvezdica + poseban prikaz "Omiljene")
+- omiljene stanice za premium korisnike (zvezdica + prikaz "Omiljene")
 - vozac portal na `/vozac`:
   - login vozaca
   - obavezna promena lozinke na prvom loginu
@@ -24,36 +24,73 @@ Aplikacija omogucava:
 
 ### 1) Podesi env fajlove
 
-`web/.env.local`:
+Root `.env` (koristi `docker-compose.yml`):
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:4000
+POSTGRES_USER=<your_postgres_user>
+POSTGRES_PASSWORD=<your_postgres_password>
+POSTGRES_DB=<your_postgres_db>
+POSTGRES_PORT=<your_postgres_port>
+JWT_SECRET=<your_jwt_secret>
+NEXT_PUBLIC_API_URL=<your_public_api_url>
 ```
 
-### 2) Pokreni bazu
+`server/.env`:
+```env
+PORT=<server_port>
+DB_HOST=<db_host>
+DB_PORT=<db_port>
+DB_USER=<db_user>
+DB_PASSWORD=<db_password>
+DB_NAME=<db_name>
+JWT_SECRET=<your_jwt_secret>
+```
+
+`web/.env.local`:
+```env
+NEXT_PUBLIC_API_URL=<your_public_api_url>
+```
+
+### 2) Pokreni kompletan stack preko Dockera
+```bash
+docker compose up -d --build
+```
+
+Servisi:
+- frontend: `http://localhost:3000`
+- backend: `http://localhost:4000`
+- baza: `localhost:5432`
+
+### 3) Opcija: samo baza u Dockeru + lokalni dev za web/server
 ```bash
 docker compose up -d db
 ```
 
-### 3) Pokreni backend
+Backend:
 ```bash
 cd server
 npm install
 npm run dev
 ```
-Backend: `http://localhost:4000`
 
-### 4) Pokreni frontend
+Frontend:
 ```bash
 cd web
 npm install
 npm run dev
 ```
-Frontend: `http://localhost:3000`
+
+### 4) Clean reset baze
+```bash
+docker compose down -v
+docker compose up -d db
+```
 
 ## API rute
 
 ### Health
 - `GET /health`
+- `GET /openapi.json` (OpenAPI specifikacija)
+- `GET /docs` (Swagger UI)
 
 ### Auth (premium korisnik)
 - `POST /auth/register`
