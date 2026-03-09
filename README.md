@@ -1,57 +1,118 @@
-# Veb aplikacija za gradski prevoz u Beogradu (MVP)
+# Veb aplikacija za gradski prevoz u Beogradu
 
-MVP aplikacije omogucava:
-- pretragu stanica po nazivu
-- prikaz informacija o stanici
-- prikaz linija koje staju na stanici
-- prikaz stanica i trase linije na mapi (Leaflet + OpenStreetMap)
-- pregled trenutnog statusa popunjenosti linije (demo)
+## Opis
+Aplikacija omogucava:
+- pretragu stanica i prikaz linija na stanici
+- prikaz trase linije na mapi (Leaflet + OpenStreetMap)
+- klik na stanicu na mapi za promenu aktivne stanice
+- prikaz statusa guzve po liniji (samo prijavljen korisnik)
+- premium naloge (registracija + login)
+- omiljene stanice za premium korisnike (zvezdica + prikaz "Omiljene")
+- vozac portal na `/vozac`:
+  - login vozaca
+  - obavezna promena lozinke na prvom loginu
+  - dodeljena dnevna linija
+  - upis statusa guzve samo za dodeljenu liniju
+  - redovna promena lozinke
 
-## Struktura
-- `web/` Next.js (React + Tailwind)
-- `server/` Express REST API
-- `docker-compose.yml` Postgres + PostGIS
+## Tehnologije
+- `web/`: Next.js + React + Tailwind
+- `server/`: Node.js + Express + pg
+- `db`: PostgreSQL + PostGIS (Docker)
 
 ## Pokretanje (lokalno)
 
-1) Pokreni bazu
+### 1) Podesi env fajlove
+
+Root `.env` (koristi `docker-compose.yml`):
+```env
+POSTGRES_USER=<your_postgres_user>
+POSTGRES_PASSWORD=<your_postgres_password>
+POSTGRES_DB=<your_postgres_db>
+POSTGRES_PORT=<your_postgres_port>
+JWT_SECRET=<your_jwt_secret>
+NEXT_PUBLIC_API_URL=<your_public_api_url>
+```
+
+`server/.env`:
+```env
+PORT=<server_port>
+DB_HOST=<db_host>
+DB_PORT=<db_port>
+DB_USER=<db_user>
+DB_PASSWORD=<db_password>
+DB_NAME=<db_name>
+JWT_SECRET=<your_jwt_secret>
+```
+
+`web/.env.local`:
+```env
+NEXT_PUBLIC_API_URL=<your_public_api_url>
+```
+
+### 2) Pokreni kompletan stack preko Dockera
+```bash
+docker compose up -d --build
+```
+
+Servisi:
+- frontend: `http://localhost:3000`
+- backend: `http://localhost:4000`
+- baza: `localhost:5432`
+
+### 3) Opcija: samo baza u Dockeru + lokalni dev za web/server
 ```bash
 docker compose up -d db
 ```
-Pre pokretanja kopiraj `.env.example` u `.env` i unesi kredencijale za bazu.
 
-2) Pokreni backend
+Backend:
 ```bash
 cd server
-cp .env.example .env
 npm install
 npm run dev
 ```
-Backend radi na `http://localhost:4000`.
 
-3) Pokreni frontend
+Frontend:
 ```bash
 cd web
-cp .env.example .env.local
 npm install
 npm run dev
 ```
-Frontend radi na `http://localhost:3000`.
 
-## API rute (osnovno)
+### 4) Clean reset baze
+```bash
+docker compose down -v
+docker compose up -d db
+```
+
+## API rute
+
+### Health
 - `GET /health`
+- `GET /openapi.json` (OpenAPI specifikacija)
+- `GET /docs` (Swagger UI)
+
+### Auth (premium korisnik)
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/promeni-lozinku` (zahteva Bearer token)
+
+### Vozac
+- `POST /vozac/login`
+- `GET /vozac/moja-linija` (vozac token)
+- `POST /vozac/moja-linija/guzva` (vozac token)
+- `POST /vozac/promeni-lozinku` (vozac token, prvi login flow)
+
+### Stanice
 - `GET /stanice?query=...`
 - `GET /stanice/:id`
 - `GET /stanice/:id/linije`
+- `GET /stanice/omiljene` (premium token)
+- `POST /stanice/:id/omiljena` (premium token)
+- `DELETE /stanice/:id/omiljena` (premium token)
+
+### Linije
 - `GET /linije?query=...`
 - `GET /linije/:id/trasa`
-- `GET /linije/:id/guzva`
-- `POST /linije/:id/guzva` `{ "status": "nema|mala|srednja|velika" }`
-
-## Demo scenario
-
-1. Korisnik pretražuje stanicu po nazivu.
-2. Aplikacija prikazuje detalje stanice.
-3. Prikazuju se linije koje staju na stanici.
-4. Klikom na liniju prikazuje se trasa na mapi.
-5. Može se videti i demo status popunjenosti linije.
+- `GET /linije/:id/guzva` (prijavljen korisnik)
+- `POST /linije/:id/guzva` (vozac token, samo dodeljena linija)
