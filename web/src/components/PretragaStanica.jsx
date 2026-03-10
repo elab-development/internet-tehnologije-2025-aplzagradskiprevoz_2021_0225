@@ -97,11 +97,11 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
   }
 
   return (
-    <div className="bg-white/80 rounded-3xl p-5 shadow-sm border border-rose/20">
+    <div className="surface-card rounded-3xl p-5 shadow-sm border border-rose/20">
       <div className="text-xs uppercase tracking-[0.3em] text-rose-400">Pretraga</div>
       <form onSubmit={handleSearch} className="mt-3 flex gap-3">
         <input
-          className="flex-1 rounded-2xl border border-rose/30 bg-white px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-rose/40"
+          className="input-surface flex-1 rounded-2xl border px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-rose/40"
           placeholder="Unesi naziv ili kod stanice..."
           value={query}
           onChange={(e) => {
@@ -144,10 +144,10 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
         </div>
       ) : null}
 
-      <div className="mt-4 text-sm text-slate-500">{loading ? 'Ucitavanje...' : ''}</div>
+      <div className="mt-4 text-sm text-muted">{loading ? 'Ucitavanje...' : ''}</div>
       <ul className="mt-3 space-y-2">
         {selectedStation ? (
-          <li className="flex items-center justify-between rounded-2xl border border-rose/20 bg-white px-4 py-3">
+          <li className="flex items-center justify-between rounded-2xl border border-rose/20 surface-strong px-4 py-3">
             <div>
               <div className="font-semibold text-ink">
                 {selectedStation.name}{' '}
@@ -179,7 +179,7 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
           (showFavoritesOnly ? favorites : results).map((s) => (
             <li
               key={s.id}
-              className="flex items-center justify-between rounded-2xl border border-rose/10 bg-white px-4 py-3 hover:border-rose/30 transition"
+              className="flex items-center justify-between rounded-2xl border border-rose/10 surface-strong px-4 py-3 hover:border-rose/30 transition"
             >
               <div>
                 <div className="font-semibold text-ink">
@@ -213,10 +213,10 @@ export default function PretragaStanica({ onStationSelected, selectedStation, on
       </ul>
 
       {!selectedStation && !loading && showFavoritesOnly && favorites.length === 0 ? (
-        <div className="mt-3 text-sm text-slate-500">Nemate omiljene stanice.</div>
+        <div className="mt-3 text-sm text-muted">Nemate omiljene stanice.</div>
       ) : null}
       {!selectedStation && !loading && !showFavoritesOnly && hasSearched && results.length === 0 ? (
-        <div className="mt-3 text-sm text-slate-500">Nema rezultata za uneti pojam.</div>
+        <div className="mt-3 text-sm text-muted">Nema rezultata za uneti pojam.</div>
       ) : null}
     </div>
   );

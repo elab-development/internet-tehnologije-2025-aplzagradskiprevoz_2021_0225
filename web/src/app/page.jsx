@@ -16,6 +16,7 @@ export default function HomePage() {
   const [lineShape, setLineShape] = useState(null);
   const [lineStations, setLineStations] = useState([]);
   const [auth, setAuth] = useState(null);
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
     const sacuvanAuth = localStorage.getItem('authData');
@@ -26,6 +27,23 @@ export default function HomePage() {
       localStorage.removeItem('authData');
     }
   }, []);
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme');
+    const prefersDark =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = storedTheme || (prefersDark ? 'dark' : 'light');
+    setTheme(initialTheme);
+    document.documentElement.dataset.theme = initialTheme;
+  }, []);
+
+  useEffect(() => {
+    if (!theme) return;
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   function normalizeShape(shape) {
     if (!shape) return null;
@@ -85,7 +103,31 @@ export default function HomePage() {
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold text-ink">Bus Minus</h1>
           </div>
-          <AuthPanel auth={auth} onAuthChange={handleAuthChange} onLogout={handleLogout} />
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="theme-toggle rounded-xl border px-3 py-2 text-sm font-semibold shadow-sm transition"
+              aria-label="Promeni temu"
+            >
+              {theme === 'dark' ? (
+                <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M12 4.25a.75.75 0 0 1 .75.75v1.25a.75.75 0 0 1-1.5 0V5a.75.75 0 0 1 .75-.75zm0 12.5a.75.75 0 0 1 .75.75V19a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75zm7.75-4.75a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5H19a.75.75 0 0 1 .75.75zM6.5 12a.75.75 0 0 1-.75.75H4.25a.75.75 0 0 1 0-1.5H5.75a.75.75 0 0 1 .75.75zm9.19-5.44a.75.75 0 0 1 1.06 0l.88.88a.75.75 0 0 1-1.06 1.06l-.88-.88a.75.75 0 0 1 0-1.06zM7.37 15.56a.75.75 0 0 1 1.06 0l.88.88a.75.75 0 0 1-1.06 1.06l-.88-.88a.75.75 0 0 1 0-1.06zm9.19 1.94a.75.75 0 0 1 0 1.06l-.88.88a.75.75 0 1 1-1.06-1.06l.88-.88a.75.75 0 0 1 1.06 0zM8.43 6.5a.75.75 0 0 1 0 1.06l-.88.88a.75.75 0 1 1-1.06-1.06l.88-.88a.75.75 0 0 1 1.06 0zM12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"
+                  />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M21 14.25a.75.75 0 0 0-.98-.71 7 7 0 1 1-9.58-9.58.75.75 0 0 0-.71-.98 9 9 0 1 0 11.27 11.27z"
+                  />
+                </svg>
+              )}
+            </button>
+            <AuthPanel auth={auth} onAuthChange={handleAuthChange} onLogout={handleLogout} />
+          </div>
         </header>
 
         <div className="grid lg:grid-cols-[360px_1fr] gap-8">
@@ -107,7 +149,7 @@ export default function HomePage() {
             ) : null}
           </aside>
 
-          <section className="rounded-3xl bg-white/70 p-4 border border-rose/20 shadow-sm">
+          <section className="rounded-3xl surface-card p-4 border border-rose/20 shadow-sm">
             <Mapa
               stations={stations}
               selectedStationId={selectedStation?.id}
@@ -115,11 +157,12 @@ export default function HomePage() {
               lineShape={lineShape}
               lineStations={lineStations}
               onStationClick={handleMapStationClick}
+              theme={theme}
             />
             {lineStations.length > 0 ? (
               <div className="mt-4">
-                <div className="text-sm font-semibold text-slate-600">Redosled stanica</div>
-                <ol className="mt-2 list-decimal list-inside text-sm text-slate-600">
+                <div className="text-sm font-semibold text-muted">Redosled stanica</div>
+                <ol className="mt-2 list-decimal list-inside text-sm text-muted">
                   {lineStations.map((s) => (
                     <li key={s.id}>{s.name}</li>
                   ))}

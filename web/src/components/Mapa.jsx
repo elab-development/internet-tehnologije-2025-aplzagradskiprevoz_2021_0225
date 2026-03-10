@@ -49,11 +49,13 @@ export default function Mapa({
   selectedStation,
   lineShape,
   lineStations,
-  onStationClick
+  onStationClick,
+  theme
 }) {
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const lineRef = useRef(null);
+  const tileRef = useRef(null);
 
   useEffect(() => {
     setupDefaultIcon();
@@ -63,11 +65,27 @@ export default function Mapa({
       center: defaultCenter,
       zoom: 13
     });
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(mapRef.current);
   }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (tileRef.current) {
+      tileRef.current.remove();
+    }
+
+    const useDark = theme === 'dark';
+    const tileUrl = useDark
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const attribution = useDark
+      ? '&copy; OpenStreetMap contributors &copy; CARTO'
+      : '&copy; OpenStreetMap contributors';
+
+    tileRef.current = L.tileLayer(tileUrl, { attribution });
+    tileRef.current.addTo(map);
+  }, [theme]);
 
   useEffect(() => {
     const map = mapRef.current;

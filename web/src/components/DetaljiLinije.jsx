@@ -24,17 +24,17 @@ export default function DetaljiLinije({ lines, onLineSelected, selectedStationId
   }
 
   return (
-    <div className="bg-white/80 rounded-2xl p-5 shadow-sm">
+    <div className="surface-card rounded-2xl p-5 shadow-sm">
       <div className="font-semibold text-lg">Linije na stanici</div>
       {lines.length === 0 ? (
-        <div className="mt-3 text-sm text-slate-500">Nema linija za izabranu stanicu.</div>
+        <div className="mt-3 text-sm text-muted">Nema linija za izabranu stanicu.</div>
       ) : (
         <ul className="mt-3 space-y-2">
           {lines.map((l) => (
             <li key={l.id} className="flex items-center justify-between">
               <div>
                 <div className="font-semibold">{l.code}</div>
-                <div className="text-xs text-slate-500">{l.name}</div>
+                <div className="text-xs text-muted">{l.name}</div>
               </div>
               <button
                 onClick={() => handleLine(l.id)}
@@ -48,7 +48,7 @@ export default function DetaljiLinije({ lines, onLineSelected, selectedStationId
         </ul>
       )}
       {selectedLineId && (
-        <div className="mt-4 rounded-xl border border-slate-100 bg-white px-3 py-2 text-sm">
+        <div className="mt-4 rounded-xl border border-rose/20 surface-strong px-3 py-2 text-sm">
           {auth?.token ? (
             <>
               Status guzve: <span className="font-semibold">{crowd || 'nepoznato'}</span>

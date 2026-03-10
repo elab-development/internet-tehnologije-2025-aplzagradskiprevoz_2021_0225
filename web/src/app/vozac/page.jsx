@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
@@ -50,6 +50,7 @@ export default function VozacPage() {
   const [greskaLozinka, setGreskaLozinka] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const [openChangePasswordModal, setOpenChangePasswordModal] = useState(false);
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
     const sacuvano = localStorage.getItem('vozacAuth');
@@ -64,6 +65,23 @@ export default function VozacPage() {
       localStorage.removeItem('vozacAuth');
     }
   }, []);
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme');
+    const prefersDark =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = storedTheme || (prefersDark ? 'dark' : 'light');
+    setTheme(initialTheme);
+    document.documentElement.dataset.theme = initialTheme;
+  }, []);
+
+  useEffect(() => {
+    if (!theme) return;
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   async function ucitajLiniju(token) {
     const data = await dohvatiVozacevuLiniju(token);
@@ -176,23 +194,46 @@ export default function VozacPage() {
   return (
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-3xl space-y-6">
-        <header className="rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
-          <h1 className="text-3xl font-semibold text-ink">Vozač portal</h1>
+        <header className="rounded-3xl border border-rose/20 surface-card p-6 shadow-sm">
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-3xl font-semibold text-ink">VozaÄ portal</h1>
+            <button
+              type="button"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="theme-toggle rounded-xl border px-3 py-2 text-sm font-semibold shadow-sm transition"
+            >
+              {theme === 'dark' ? (
+                <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M12 4.25a.75.75 0 0 1 .75.75v1.25a.75.75 0 0 1-1.5 0V5a.75.75 0 0 1 .75-.75zm0 12.5a.75.75 0 0 1 .75.75V19a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75zm7.75-4.75a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5H19a.75.75 0 0 1 .75.75zM6.5 12a.75.75 0 0 1-.75.75H4.25a.75.75 0 0 1 0-1.5H5.75a.75.75 0 0 1 .75.75zm9.19-5.44a.75.75 0 0 1 1.06 0l.88.88a.75.75 0 0 1-1.06 1.06l-.88-.88a.75.75 0 0 1 0-1.06zM7.37 15.56a.75.75 0 0 1 1.06 0l.88.88a.75.75 0 0 1-1.06 1.06l-.88-.88a.75.75 0 0 1 0-1.06zm9.19 1.94a.75.75 0 0 1 0 1.06l-.88.88a.75.75 0 1 1-1.06-1.06l.88-.88a.75.75 0 0 1 1.06 0zM8.43 6.5a.75.75 0 0 1 0 1.06l-.88.88a.75.75 0 1 1-1.06-1.06l.88-.88a.75.75 0 0 1 1.06 0zM12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"
+                  />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M21 14.25a.75.75 0 0 0-.98-.71 7 7 0 1 1-9.58-9.58.75.75 0 0 0-.71-.98 9 9 0 1 0 11.27 11.27z"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
         </header>
 
         {!auth?.token ? (
-          <section className="relative rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
+          <section className="relative rounded-3xl border border-rose/20 surface-card p-6 shadow-sm">
             <h2 className="text-lg font-semibold">Prijava vozaca</h2>
             <form onSubmit={handleLogin} className="mt-4 space-y-3">
               <input
-                className="w-full rounded-xl border border-rose/30 px-4 py-3"
+                className="input-surface w-full rounded-xl border px-4 py-3"
                 placeholder="Korisnicko ime"
                 value={korisnickoIme}
                 onChange={(e) => setKorisnickoIme(e.target.value)}
                 required
               />
               <input
-                className="w-full rounded-xl border border-rose/30 px-4 py-3"
+                className="input-surface w-full rounded-xl border px-4 py-3"
                 type="password"
                 placeholder="Lozinka"
                 value={lozinka}
@@ -206,14 +247,14 @@ export default function VozacPage() {
             </form>
           </section>
         ) : auth?.mustChangePassword ? (
-          <section className="relative rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
-            <h2 className="text-lg font-semibold">Obavezna promena šifre</h2>
-            <p className="mt-2 text-sm text-slate-600">
+          <section className="relative rounded-3xl border border-rose/20 surface-card p-6 shadow-sm">
+            <h2 className="text-lg font-semibold">Obavezna promena Å¡ifre</h2>
+            <p className="mt-2 text-sm text-muted">
               Pre nastavka rada unesite novu sifru dva puta.
             </p>
             <form onSubmit={handleObaveznaPromenaLozinke} className="mt-4 space-y-3">
               <input
-                className="w-full rounded-xl border border-rose/30 px-4 py-3"
+                className="input-surface w-full rounded-xl border px-4 py-3"
                 type="password"
                 placeholder="Nova lozinka"
                 value={novaLozinka}
@@ -221,7 +262,7 @@ export default function VozacPage() {
                 required
               />
               <input
-                className="w-full rounded-xl border border-rose/30 px-4 py-3"
+                className="input-surface w-full rounded-xl border px-4 py-3"
                 type="password"
                 placeholder="Potvrda nove lozinke"
                 value={potvrdaLozinke}
@@ -231,12 +272,12 @@ export default function VozacPage() {
               {greska ? <div className="text-sm text-red-600">{greska}</div> : null}
               {poruka ? <div className="text-sm text-emerald-700">{poruka}</div> : null}
               <button className="rounded-xl bg-rose px-4 py-2 font-semibold text-white" type="submit">
-                Sačuvaj novu sifru
+                SaÄuvaj novu sifru
               </button>
             </form>
           </section>
         ) : (
-          <section className="rounded-3xl border border-rose/20 bg-white/80 p-6 shadow-sm">
+          <section className="rounded-3xl border border-rose/20 surface-card p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Dodeljena linija za danas</h2>
               <button
@@ -254,7 +295,7 @@ export default function VozacPage() {
               </button>
             </div>
             {menuOpen ? (
-              <div className="absolute right-10 mt-1 z-20 w-44 rounded-xl border border-rose/20 bg-white p-1 shadow-lg">
+              <div className="absolute right-10 mt-1 z-20 w-44 rounded-xl border border-rose/20 surface-strong p-1 shadow-lg">
                 <button
                   type="button"
                   onClick={() => {
@@ -264,7 +305,7 @@ export default function VozacPage() {
                   }}
                   className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-700 hover:bg-rose-50"
                 >
-                  Promena šifre
+                  Promena Å¡ifre
                 </button>
                 <button
                   type="button"
@@ -277,9 +318,9 @@ export default function VozacPage() {
             ) : null}
 
             {linija ? (
-              <div className="mt-4 rounded-xl border border-slate-200 bg-white px-4 py-3">
+              <div className="mt-4 rounded-xl border border-rose/20 surface-strong px-4 py-3">
                 <div className="text-xl font-semibold">{linija.code}</div>
-                <div className="text-sm text-slate-600">{linija.name}</div>
+                <div className="text-sm text-muted">{linija.name}</div>
                 <div className="mt-2 text-sm">
                   Trenutni status guzve: <span className="font-semibold">{statusGuzve}</span>
                 </div>
@@ -287,7 +328,7 @@ export default function VozacPage() {
                   <select
                     value={izabraniStatus}
                     onChange={(e) => setIzabraniStatus(e.target.value)}
-                    className="rounded-xl border border-rose/30 bg-white px-3 py-2"
+                    className="input-surface rounded-xl border px-3 py-2"
                   >
                     {statusOpcije.map((opcija) => (
                       <option key={opcija.value} value={opcija.value}>
@@ -300,25 +341,26 @@ export default function VozacPage() {
                     type="button"
                     className="rounded-xl bg-rose px-4 py-2 font-semibold text-white"
                   >
-                    Sačuvaj status
+                    SaÄuvaj status
                   </button>
                 </div>
                 {poruka ? <div className="mt-3 text-sm text-emerald-700">{poruka}</div> : null}
                 {greska ? <div className="mt-3 text-sm text-red-600">{greska}</div> : null}
               </div>
             ) : (
-              <div className="mt-4 text-sm text-slate-600">Linija jos nije dodeljena.</div>
+              <div className="mt-4 text-sm text-muted">Linija jos nije dodeljena.</div>
             )}
 
             {linija ? (
-              <div className="mt-4 rounded-2xl border border-rose/20 bg-white/70 p-3">
-                <div className="mb-2 text-sm font-semibold text-slate-700">Trasa današnje linije</div>
+              <div className="mt-4 rounded-2xl border border-rose/20 surface-strong p-3">
+                <div className="mb-2 text-sm font-semibold text-muted">Trasa danaÅ¡nje linije</div>
                 <Mapa
                   stations={[]}
                   selectedStationId={null}
                   selectedStation={null}
                   lineShape={lineShape}
                   lineStations={lineStations}
+                  theme={theme}
                 />
               </div>
             ) : null}
@@ -329,11 +371,11 @@ export default function VozacPage() {
       </div>
       {openChangePasswordModal ? (
         <div className="fixed inset-0 z-[1600] flex items-center justify-center bg-black/35 p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-rose/20 bg-white p-4 shadow-xl">
-            <div className="mb-3 text-base font-semibold text-ink">Promena šifre</div>
+          <div className="w-full max-w-sm rounded-2xl border border-rose/20 surface-strong p-4 shadow-xl">
+            <div className="mb-3 text-base font-semibold text-ink">Promena Å¡ifre</div>
             <form onSubmit={handleRedovnaPromenaLozinke} className="space-y-2">
               <input
-                className="w-full rounded-xl border border-rose/30 px-3 py-2"
+                className="input-surface w-full rounded-xl border px-3 py-2"
                 type="password"
                 placeholder="Stara lozinka"
                 value={staraLozinkaRedovna}
@@ -341,7 +383,7 @@ export default function VozacPage() {
                 required
               />
               <input
-                className="w-full rounded-xl border border-rose/30 px-3 py-2"
+                className="input-surface w-full rounded-xl border px-3 py-2"
                 type="password"
                 placeholder="Nova lozinka"
                 value={novaLozinkaRedovna}
@@ -349,7 +391,7 @@ export default function VozacPage() {
                 required
               />
               <input
-                className="w-full rounded-xl border border-rose/30 px-3 py-2"
+                className="input-surface w-full rounded-xl border px-3 py-2"
                 type="password"
                 placeholder="Potvrda nove lozinke"
                 value={potvrdaLozinkeRedovna}
@@ -369,7 +411,7 @@ export default function VozacPage() {
                   type="submit"
                   className="rounded-xl bg-rose px-4 py-2 text-sm font-semibold text-white"
                 >
-                  Sačuvaj
+                  SaÄuvaj
                 </button>
               </div>
             </form>
